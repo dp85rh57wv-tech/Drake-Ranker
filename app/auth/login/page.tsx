@@ -1,15 +1,12 @@
 "use client";
 
-import { useState, useSearchParams } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -59,12 +56,6 @@ export default function LoginPage() {
             Drake Ranker
           </h1>
           <p className="text-gray-400 text-center mb-8">Sign in to your account</p>
-
-          {message && (
-            <div className="bg-green-500 bg-opacity-10 border border-green-500 text-green-500 px-4 py-3 rounded mb-6">
-              {message}
-            </div>
-          )}
 
           {error && (
             <div className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 px-4 py-3 rounded mb-6">
