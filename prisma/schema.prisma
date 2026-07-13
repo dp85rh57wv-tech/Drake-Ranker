@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  username  String     @unique
+  password  String
+  avatar    String?
+  bio       String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  rankings  Ranking[]
+  likes     Like[]
+}
+
+model Song {
+  id        String     @id @default(cuid())
+  title     String
+  artist    String     @default("Drake")
+  album     String?
+  spotifyId String?
+  imageUrl  String?
+  createdAt DateTime   @default(now())
+
+  rankingItems RankingItem[]
+}
+
+model Ranking {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  description String?
+  
+  items       RankingItem[]
+  likes       Like[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model RankingItem {
+  id          String     @id @default(cuid())
+  rankingId   String
+  ranking     Ranking    @relation(fields: [rankingId], references: [id], onDelete: Cascade)
+  
+  songId      String
+  song        Song       @relation(fields: [songId], references: [id])
+  
+  position    Int        // 1 = best, 100 = worst, etc.
+  notes       String?    // Optional user notes about why they ranked it here
+  
+  @@index([rankingId])
+  @@index([songId])
+}
+
+model Like {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  rankingId String
+  ranking   Ranking    @relation(fields: [rankingId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, rankingId])
+  @@index([userId])
+  @@index([rankingId])
+}
